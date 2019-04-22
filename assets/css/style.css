@@ -2,3 +2,22 @@
   background-color: #302f2f;
   color: #f1f1f1;
 }
+
+.table {
+  border: 1px solid black;
+}
+
+.form {
+  margin-top: 5em;
+  margin-bottom: 2em;
+  border: 1px solid black;
+}
+
+.form-header {
+  color: white;
+  padding: 10px;
+}
+
+.form-body {
+  padding: 1em;
+}

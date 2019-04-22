@@ -9,12 +9,10 @@ var config = {
 };
 firebase.initializeApp(config);
 
-// initial variables
 const database = firebase.database()
-let trainName = '', destination = '', firstTrainTime = 0, frequency = 0
+let trainName = '', destination = '', firstTrainTime = 0, frequency = 0, nextArrival = 0, minutesAway = 0
 
 
-// info gets submitted from form
 $('#submit').on('click', function() {
   event.preventDefault()
 
@@ -23,15 +21,18 @@ $('#submit').on('click', function() {
   firstTrainTime = $('#first-train-time').val().trim()
   frequency = $('#frequency').val().trim()
 
-  // push data to database
+  nextArrival = findNextArrival()
+  minutesAway = findMinutesAway()
+
   database.ref().push({
     trainName: trainName,
     destination: destination,
     firstTrainTime: firstTrainTime,
-    frequency: frequency
+    frequency: frequency,
+    nextArrival: nextArrival,
+    minutesAway: minutesAway
   })
 
-  // clear form fields
   trainName = $('#train-name').val('')
   destination = $('#destination').val('')
   firstTrainTime = $('#first-train-time').val('')
@@ -39,17 +40,26 @@ $('#submit').on('click', function() {
 })
 
 
-// data is added to database
+function findNextArrival() {
+
+}
+
+
+function findMinutesAway() {
+
+}
+
+
 database.ref().on('child_added', function(snapshot) {
   let sv = snapshot.val()
 
-  //log the user's data
   console.log(sv.trainName)
   console.log(sv.destination)
   console.log(sv.firstTrainTime)
   console.log(sv.frequency)
+  console.log(sv.nextArrival)
+  console.log(sv.minutesAway)
 
-  // update the table with new user data
   addToTable(sv)
 
 }, function(errorObject) {
@@ -57,11 +67,12 @@ database.ref().on('child_added', function(snapshot) {
 })
 
 
-// update html
 function addToTable(sv) {
   let newRow = $('<tr>').appendTo('tbody')
+
   let trainName = $(`<td>${sv.trainName}</td>`).appendTo(newRow)
   let destination = $(`<td>${sv.destination}</td>`).appendTo(newRow)
-  let firstTrainTime = $(`<td>${sv.firstTrainTime}</td>`).appendTo(newRow)
   let frequency = $(`<td>${sv.frequency}</td>`).appendTo(newRow)
+  let nextArrival = $(`<td>${sv.nextArrival}</td>`).appendTo(newRow)
+  let minutesAway = $(`<td>${sv.minutesAway}</td>`).appendTo(newRow)
 }
