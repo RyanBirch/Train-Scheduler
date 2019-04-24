@@ -1,6 +1,7 @@
 .jumbotron {
-  background-color: #302f2f;
-  color: #f1f1f1;
+  padding: 2em 1em;
+  background-color: #343a40;
+  color: #fff;
 }
 
 .table {

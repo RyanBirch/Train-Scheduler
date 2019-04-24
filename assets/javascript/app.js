@@ -6,8 +6,8 @@ var config = {
   projectId: "train-scheduler-e9e85",
   storageBucket: "train-scheduler-e9e85.appspot.com",
   messagingSenderId: "592072680965"
-};
-firebase.initializeApp(config);
+}
+firebase.initializeApp(config)
 
 const database = firebase.database()
 let trainName = '', destination = '', firstTrainTime = 0, frequency = 0, nextArrival = 0, minutesAway = 0
@@ -21,8 +21,9 @@ $('#submit').on('click', function() {
   firstTrainTime = $('#first-train-time').val().trim()
   frequency = $('#frequency').val().trim()
 
-  nextArrival = findNextArrival()
-  minutesAway = findMinutesAway()
+  let result = findNextArrival()
+  nextArrival = result[0]
+  minutesAway = result[1]
 
   database.ref().push({
     trainName: trainName,
@@ -33,32 +34,46 @@ $('#submit').on('click', function() {
     minutesAway: minutesAway
   })
 
-  trainName = $('#train-name').val('')
-  destination = $('#destination').val('')
-  firstTrainTime = $('#first-train-time').val('')
-  frequency = $('#frequency').val('')
+  $('#train-name').val('')
+  $('#destination').val('')
+  $('#first-train-time').val('')
+  $('#frequency').val('')
 })
 
 
 function findNextArrival() {
+  let now = moment()
+  let currentTime = moment(now).format('hh:mm')
+  let firstTrain = moment(firstTrainTime, 'HH:mm')
+  let diff = moment().diff(firstTrain)
 
-}
+  let nextTrain, minutesUntilTrain
 
+  console.log(`diff: ${diff}`)
 
-function findMinutesAway() {
-
+  // train hasn't left yet
+  if (diff < 0) nextArrival = firstTrainTime
+  // train leaves now
+  else if (diff === 0) nextArrival = currentTime
+  // first train has already left
+  else {
+    let diffMin = moment(diff).format('mm')
+    console.log('diffMin: ' + diffMin)
+    let remainder = diffMin % frequency
+    minutesUntilTrain = frequency  - remainder
+    console.log(`firstTrainTime: ${firstTrainTime}`)
+    console.log(`minutesUntilTrain: ${minutesUntilTrain}`)
+    console.log(`frequency: ${frequency}`)
+    nextTrain = moment().add(minutesUntilTrain, 'minutes')
+    nextArrival = moment(nextTrain).format('LT')
+    console.log(`nextArrival: ${nextArrival}`)
+  }
+  return [nextArrival, minutesUntilTrain]
 }
 
 
 database.ref().on('child_added', function(snapshot) {
   let sv = snapshot.val()
-
-  console.log(sv.trainName)
-  console.log(sv.destination)
-  console.log(sv.firstTrainTime)
-  console.log(sv.frequency)
-  console.log(sv.nextArrival)
-  console.log(sv.minutesAway)
 
   addToTable(sv)
 
@@ -76,3 +91,26 @@ function addToTable(sv) {
   let nextArrival = $(`<td>${sv.nextArrival}</td>`).appendTo(newRow)
   let minutesAway = $(`<td>${sv.minutesAway}</td>`).appendTo(newRow)
 }
+
+/*
+function updateEveryMinute() {
+  let interval = setInterval(function() {
+    database.ref().on('value', function(snapshot) {
+      for (let key in snapshot.val()) {
+
+        firstTrainTime = key.firstTrainTime
+        let result = findNextArrival()
+        nextArrival = result[0]
+        minutesAway = result[1]
+
+        database.ref(key).update({
+          nextArrival: nextArrival,
+          minutesAway: minutesAway
+        })
+      }
+    })
+  }, 1000 * 5)
+}
+
+updateEveryMinute()
+*/
