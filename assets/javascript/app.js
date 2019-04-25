@@ -97,43 +97,47 @@ database.ref().on('child_added', function(snapshot) {
 
 // update html live every minute
 function updateEveryMinute() {
-  var interval = setInterval(function() {
-    database.ref().once('value').then(function(snapshot) {
-      // loop through nodes in database
-      snapshot.forEach(function(childSnapshot) {
-
-        var childKey = childSnapshot.key
-
-        // go another layer deep
-        childSnapshot.forEach(function(secondChild) {
-
-          var key = secondChild.key
-
-          // update global variables to values in the current node
-          if (key === 'firstTrainTime') firstTrainTime = secondChild.val()
-          if (key === 'frequency') frequency = secondChild.val()
-          if (key === 'trainName') trainName = secondChild.val()
-
-        })
-
-        // calculate nextArrival for specific entry
-        let result = findNextArrival()
-        nextArrival = result[0]
-        minutesAway = result[1]
-
-        // update database with new arrival time
-        database.ref(childKey).update({
-          nextArrival: nextArrival,
-          minutesAway: minutesAway
-        })
-
-        // update html
-        $('#' + trainName + 'row').find('#nextArrival').html(nextArrival)
-        $('#' + trainName + 'row').find('#minutesAway').html(minutesAway)
-      })
-    })
-  }, 1000 * 60)
+  var interval = setInterval(update, 1000 * 60)
 }
 
 
+// update database and html
+function update() {
+  database.ref().once('value').then(function(snapshot) {
+    // loop through nodes in database
+    snapshot.forEach(function(childSnapshot) {
+
+      var childKey = childSnapshot.key
+
+      // go another layer deep
+      childSnapshot.forEach(function(secondChild) {
+
+        var key = secondChild.key
+
+        // update global variables to values in the current node
+        if (key === 'firstTrainTime') firstTrainTime = secondChild.val()
+        if (key === 'frequency') frequency = secondChild.val()
+        if (key === 'trainName') trainName = secondChild.val()
+
+      })
+
+      // calculate nextArrival for specific entry
+      let result = findNextArrival()
+      nextArrival = result[0]
+      minutesAway = result[1]
+
+      // update database with new arrival time
+      database.ref(childKey).update({
+        nextArrival: nextArrival,
+        minutesAway: minutesAway
+      })
+
+      // update html
+      $('#' + trainName + 'row').find('#nextArrival').html(nextArrival)
+      $('#' + trainName + 'row').find('#minutesAway').html(minutesAway)
+    })
+  })
+}
+
+update()
 updateEveryMinute()
