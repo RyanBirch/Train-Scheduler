@@ -10,7 +10,7 @@ var config = {
 firebase.initializeApp(config)
 
 const database = firebase.database()
-let trainName = '', destination = '', firstTrainTime = 0, frequency = 0, nextArrival = 0, minutesAway = 0
+var trainName = '', destination = '', firstTrainTime = 0, frequency = 0, nextArrival = 0, minutesAway = 0
 
 
 $('#submit').on('click', function() {
@@ -92,25 +92,41 @@ function addToTable(sv) {
   let minutesAway = $(`<td>${sv.minutesAway}</td>`).appendTo(newRow)
 }
 
-/*
-function updateEveryMinute() {
-  let interval = setInterval(function() {
-    database.ref().on('value', function(snapshot) {
-      for (let key in snapshot.val()) {
 
-        firstTrainTime = key.firstTrainTime
+function updateEveryMinute() {
+  var interval = setInterval(function() {
+    database.ref().once('value').then(function(snapshot) {
+      snapshot.forEach(function(childSnapshot) {
+
+        var childKey = childSnapshot.key
+        console.log('child key: ' + childKey)
+
+        childSnapshot.forEach(function(secondChild) {
+
+          var key = secondChild.key
+          console.log('second child key: ' + key)
+
+          if (key === 'firstTrainTime') firstTrainTime = secondChild.val()
+          if (key === 'frequency') frequency = secondChild.val()
+          console.log('ftt: ' + firstTrainTime, 'frq: ' + frequency)
+
+        })
+
         let result = findNextArrival()
         nextArrival = result[0]
         minutesAway = result[1]
+        console.log('nextArrival: ' + nextArrival)
+        console.log('minutesAway: ' + minutesAway)
 
-        database.ref(key).update({
+        database.ref(childKey).update({
           nextArrival: nextArrival,
           minutesAway: minutesAway
         })
-      }
+
+        //$(`${this.trainName}`).find()
+      })
     })
-  }, 1000 * 5)
+  }, 1000 * 60)
 }
 
 updateEveryMinute()
-*/
