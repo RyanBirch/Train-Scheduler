@@ -126,7 +126,7 @@ function updateEveryMinute() {
         //$(`${this.trainName}`).find()
       })
     })
-  }, 1000 * 60)
+  }, 1000 * 3)
 }
 
 updateEveryMinute()
