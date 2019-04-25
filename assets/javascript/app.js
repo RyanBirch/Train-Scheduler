@@ -75,13 +75,25 @@ function findNextArrival() {
 database.ref().on('child_added', function(snapshot) {
   let sv = snapshot.val()
 
-  addToTable(sv)
+  let newRow = $('<tr>').appendTo('tbody')
+  newRow.attr('id', sv.trainName + 'row')
+
+  let trainName = $(`<td>${sv.trainName}</td>`).appendTo(newRow)
+  let destination = $(`<td>${sv.destination}</td>`).appendTo(newRow)
+  let frequency = $(`<td>${sv.frequency}</td>`).appendTo(newRow)
+  let nextArrival = $(`<td>${sv.nextArrival}</td>`).appendTo(newRow)
+  nextArrival.attr('id', 'nextArrival')
+  let minutesAway = $(`<td>${sv.minutesAway}</td>`).appendTo(newRow)
+  minutesAway.attr('id', 'minutesAway')
+
+  // addToTable(sv)
 
 }, function(errorObject) {
   console.log(`Errors handled: ${errorObject.code}`)
 })
 
 
+/*
 function addToTable(sv) {
   let newRow = $('<tr>').appendTo('tbody')
 
@@ -91,6 +103,7 @@ function addToTable(sv) {
   let nextArrival = $(`<td>${sv.nextArrival}</td>`).appendTo(newRow)
   let minutesAway = $(`<td>${sv.minutesAway}</td>`).appendTo(newRow)
 }
+*/
 
 
 function updateEveryMinute() {
@@ -108,6 +121,7 @@ function updateEveryMinute() {
 
           if (key === 'firstTrainTime') firstTrainTime = secondChild.val()
           if (key === 'frequency') frequency = secondChild.val()
+          if (key === 'trainName') trainName = secondChild.val()
           console.log('ftt: ' + firstTrainTime, 'frq: ' + frequency)
 
         })
@@ -123,10 +137,11 @@ function updateEveryMinute() {
           minutesAway: minutesAway
         })
 
-        //$(`${this.trainName}`).find()
+        $('#' + trainName + 'row').find('#nextArrival').html(nextArrival)
+        $('#' + trainName + 'row').find('#minutesAway').html(minutesAway)
       })
     })
-  }, 1000 * 3)
+  }, 1000 * 60)
 }
 
 updateEveryMinute()
