@@ -1,7 +1,11 @@
 .jumbotron {
-  padding: 2em 1em;
+  padding: 1em 1em;
   background-color: #343a40;
   color: #fff;
+}
+
+.jumbotron h1 {
+  font-size: 3.5em;
 }
 
 .table {
