@@ -65,8 +65,6 @@ function findNextArrival() {
   }
   // first train has already left
   else {
-    //let diffMin = moment(diff).format('mm')
-    //let remainder = diffMin % frequency
     diff = moment().diff(firstTrain, 'minutes')
     let remainder = diff % frequency
     minutesUntilTrain = frequency  - remainder
